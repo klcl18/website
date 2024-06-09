@@ -1,28 +1,59 @@
-// Function to fetch and process data from 'data.json'
-async function fetchData() {
+let constantsData = null;
+let recommendationsData = null;
+
+async function fetchAllData() {
   try {
-      const response = await fetch('data.json');
-      const data = await response.json();
-      return data;
+    const [constantsResponse, dataResponse] = await Promise.all([
+      fetch('constants.json'),
+      fetch('data.json')
+    ]);
+
+    constantsData = await constantsResponse.json();
+    dataData = await dataResponse.json();
   } catch (error) {
-      console.error('Error fetching data:', error);
-  }
-}
-//considered fetching both jsons in one fetch but seemed to create more problems
-// Function to fetch and process constants from 'constants.json'
-async function fetchConstants() {
-  try {
-      const response = await fetch('constants.json');
-      const data = await response.json();
-      return data;
-  } catch (error) {
-      console.error('Error fetching data:', error);
+    console.error('Error fetching data:', error);
   }
 }
 
+
+// // Function to fetch and process data from 'data.json'
+// async function fetchData() {
+//   try {
+//       const response = await fetch('data.json');
+//       const data = await response.json();
+//       return data;
+//   } catch (error) {
+//       console.error('Error fetching data:', error);
+//   }
+// }
+// //considered fetching both jsons in one fetch but seemed to create more problems
+// // Function to fetch and process constants from 'constants.json'
+// async function fetchConstants() {
+//   try {
+//       const response = await fetch('constants.json');
+//       const data = await response.json();
+//       return data;
+//   } catch (error) {
+//       console.error('Error fetching data:', error);
+//   }
+// }
+
+// Function to fetch constants from the cached data
+function getConstants() {
+  return constantsData;
+}
+
+// Function to fetch recommendations from the cached data
+function getData() {
+  return dataData;
+}
+
+
 //Function to fetch constants and populate pot type dropdown menu in only one FOR loop
 async function populateDropdown() {
-  const data = await fetchConstants();
+  if (!constantsData) await fetchAllData();
+
+  const data = getConstants();
   if (!data) return;
 
   const potType= document.getElementById("potType");
@@ -51,8 +82,6 @@ async function populateDropdown() {
   }
 
 
-
-
 }
 
 function initialize() { //only have to initialize one function 
@@ -67,7 +96,9 @@ function calculatePotVolume(diameter, height) {
 
 //Function to calculate water and fertilizer recommendations
 async function calculateRecommendations(potVolume, potType, plantType, season) {
-  const data = await fetchConstants();
+  if (!constantsData) await fetchAllData();
+
+  const data = getConstants();
   if (!data) return;
 
   let potdata
@@ -96,7 +127,9 @@ async function calculateRecommendations(potVolume, potType, plantType, season) {
 
 // Function to search recommendations data and calculate statistics based on it and user inputs
 async function findRecommendations(potVolume, potType, plantType, season) {
-  const data = await fetchData();
+  if (!dataData) await fetchAllData();
+
+  const data = getData();
   if (!data) return;
 
   let similarCount = 0
