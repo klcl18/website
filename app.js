@@ -39,19 +39,20 @@ async function populateDropdown() {
   const seasonType = document.getElementById("season");
 
   for (let i = 0; i < data.length; i++) {
-    if(data[i].datatype === "pot") {
+    var datatype = data[i].datatype;
+    if(datatype === "pot") {
       var option = document.createElement("option");
       option.text = data[i].name;
       option.value = data[i].name;
       potType.add(option);
     }
-    else if(data[i].datatype === "species") {
+    else if(datatype === "species") {
       var option = document.createElement("option");
       option.text = data[i].name;
       option.value = data[i].name;
       plantType.add(option);
     }
-    else if(data[i].datatype === "season") {
+    else if(datatype === "season") {
       var option = document.createElement("option");
       option.text = data[i].name;
       option.value = data[i].name;
@@ -118,36 +119,26 @@ async function findRecommendations(potVolume, potType, plantType, season) {
   let morewaterGrowthSum = 0
   let morewaterYieldSum = 0
 
+  //combined 4 FOR loops into one
   for (let i = 0; i < data.length; i++) {
     if(data[i].pot_type === potType && data[i].plant_type === plantType && data[i].time_of_year === season 
       && data[i].pot_volume > (potVolume * 0.9)  && data[i].pot_volume > (potVolume * 1.1)) {
         similarCount = similarCount + 1
-    }
-  } 
-  
-  
-  //combined 3 FOR loops into one
-  for (let i = 0; i < data.length; i++) {
-    if(data[i].pot_type === potType && data[i].plant_type === plantType && data[i].time_of_year === season 
-      && data[i].pot_volume > (potVolume * 0.9)  && data[i].pot_volume > (potVolume * 1.1)
-      && data[i].actual_water >  (data[i].recommended_water * 0.9) && data[i].actual_water >  (data[i].recommended_water * 1.1)) {
-        similarwaterCount = similarwaterCount + 1
-        similarwaterGrowthSum = similarwaterGrowthSum + data[i].growth_rate
-        similarwaterYieldSum = similarwaterYieldSum + data[i].crop_yield
-    }
-    else if(data[i].pot_type === potType && data[i].plant_type === plantType && data[i].time_of_year === season 
-      && data[i].pot_volume > (potVolume * 0.9)  && data[i].pot_volume > (potVolume * 1.1)
-      && data[i].actual_water <=  (data[i].recommended_water * 0.9) ) {
-        lesswaterCount = lesswaterCount + 1
-        lesswaterGrowthSum = lesswaterGrowthSum + data[i].growth_rate
-        lesswaterYieldSum = lesswaterYieldSum + data[i].crop_yield
-    }
-    else if(data[i].pot_type === potType && data[i].plant_type === plantType && data[i].time_of_year === season 
-      && data[i].pot_volume > (potVolume * 0.9)  && data[i].pot_volume > (potVolume * 1.1)
-      &&  data[i].actual_water >=  (data[i].recommended_water * 1.1)) {
-        morewaterCount = morewaterCount + 1
-        morewaterGrowthSum = morewaterGrowthSum + data[i].growth_rate
-        morewaterYieldSum = morewaterYieldSum + data[i].crop_yield
+        if (data[i].actual_water >  (data[i].recommended_water * 0.9) && data[i].actual_water >  (data[i].recommended_water * 1.1)) {
+          similarwaterCount = similarwaterCount + 1
+          similarwaterGrowthSum = similarwaterGrowthSum + data[i].growth_rate
+          similarwaterYieldSum = similarwaterYieldSum + data[i].crop_yield
+        }
+        else if(data[i].actual_water <=  (data[i].recommended_water * 0.9) ) {
+          lesswaterCount = lesswaterCount + 1
+          lesswaterGrowthSum = lesswaterGrowthSum + data[i].growth_rate
+          lesswaterYieldSum = lesswaterYieldSum + data[i].crop_yield
+        }
+        else if( data[i].actual_water >=  (data[i].recommended_water * 1.1)) {
+          morewaterCount = morewaterCount + 1
+          morewaterGrowthSum = morewaterGrowthSum + data[i].growth_rate
+          morewaterYieldSum = morewaterYieldSum + data[i].crop_yield
+        }
     }
   } 
 
@@ -184,3 +175,4 @@ document.getElementById('calculateButton').addEventListener('click', function() 
   // Find and display recommendations and statistics
   findRecommendations(potVolume, potType, plantType, season);
 });
+
